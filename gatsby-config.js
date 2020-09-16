@@ -1,14 +1,14 @@
 module.exports = {
   siteMetadata: {
-    title: `Gatsby Starter Blog`,
+    title: `Curious Sourabh`,
     author: {
-      name: `Kyle Mathews`,
-      summary: `who lives and works in San Francisco building useful things.`,
+      name: `Sourabh`,
+      summary: `who lives and works in the moment, building and breaking stuff just for the kick of it.`,
     },
-    description: `A starter blog demonstrating what Gatsby can do.`,
+    description: `An attempt to dive deeper and break the abstractions`,
     siteUrl: `https://gatsby-starter-blog-demo.netlify.app/`,
     social: {
-      twitter: `kylemathews`,
+      twitter: `iamsourabhh`,
     },
   },
   plugins: [
