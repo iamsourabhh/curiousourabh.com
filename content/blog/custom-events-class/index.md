@@ -6,6 +6,8 @@ description: "An attempt to do a custom implementation of the Event service in j
 
 I have been working on Node for quite some time and have extensively used Events. But never knew how it works internally until very recently.
 
+![Alt Text](https://dev-to-uploads.s3.amazonaws.com/i/7rlv6f2tztuecnr6ldea.jpeg)
+
 ### What are Events?
 So basically, when something happens in your app like a user gets logged in, you fire an event to notify everybody listening to that event, that a user has logged in.
 ```javascript
