@@ -1,19 +1,84 @@
 ---
-title: Hello World
-date: "2020-09-16T22:12:03.284Z"
-description: "Hello World"
+title: Custom event listeners and subscribers in Javascript.
+date: "2020-12-15T22:12:03.284Z"
+description: "An attempt to do a custom implementation of the Event service in javascript"
 ---
 
-This is my first post on my new fake blog! How exciting!
+I have been working on Node for quite some time and have extensively used Events. But never knew how it works internally until very recently.
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aliquet in orci eu interdum. Quisque ultricies congue orci vitae feugiat. Mauris vestibulum imperdiet fermentum. Nulla bibendum enim et purus egestas placerat. Curabitur felis nisi, finibus a ultricies eu, malesuada pharetra arcu. Nam at porttitor arcu. In hac habitasse platea dictumst. Vestibulum sed arcu non odio ullamcorper rutrum. Suspendisse potenti. Vivamus rutrum auctor commodo. Fusce sit amet vulputate orci. Etiam posuere cursus dui. Integer eu felis lorem. Ut tellus ligula, condimentum id semper ac, rutrum ut urna. Donec maximus erat non dapibus imperdiet. Nullam tristique tortor id libero dictum, sed tempus leo accumsan.
+### What are Events?
+So basically, when something happens in your app like a user gets logged in, you fire an event to notify everybody listening to that event, that a user has logged in.
+```javascript
 
-Sed maximus, nulla in tempus sodales, est turpis cursus ex, at pellentesque risus mauris quis ex. Aenean in odio quis risus fermentum tempus vel eu nibh. Nam consectetur velit massa, et venenatis lectus auctor in. Nam sagittis libero non ex maximus sollicitudin ut non odio. Integer vel risus sem. Morbi facilisis iaculis erat sit amet molestie. Nulla viverra tristique volutpat. Duis nibh justo, imperdiet non eros tincidunt, porttitor porttitor lacus. Morbi tincidunt et felis eget ultricies.
+function login(data) {
+    // fires an event
+    CustomEvent.emit('user_logged_in', data);
+}
 
-Donec vehicula enim nulla, a gravida libero consequat quis. Curabitur eu enim venenatis, scelerisque diam eu, molestie nibh. Donec id vulputate nulla, nec malesuada arcu. Sed sodales mauris vel odio efficitur molestie. Duis elit est, feugiat eget consequat nec, pellentesque vitae nunc. Aenean sodales at urna in finibus. Phasellus tincidunt dui nec euismod porta. Phasellus semper lacinia pharetra. Aliquam dapibus ligula nec ornare sagittis. Fusce dolor est, auctor ac mollis ut, efficitur hendrerit sem. Cras non ultricies ipsum, a placerat arcu. Phasellus ipsum dolor, ullamcorper id molestie in, efficitur non nibh. Nulla facilisi. Aenean lectus ligula, vulputate eu pellentesque et, fermentum non mi. Nullam consequat congue velit eu cursus.
+function someOtherFunc() {
+    // event listeners
+    CustomEvent.subscribe('user_logged_in', function(data) {
+        // do some operation
+    })
+}
 
-Nullam convallis, lacus vitae vestibulum fringilla, tellus neque rhoncus dui, quis tristique tellus enim efficitur nisi. Aenean vitae eleifend diam, id tincidunt tortor. Donec a est neque. Fusce elementum turpis sem, vulputate vehicula justo ultricies non. Sed feugiat augue at mattis hendrerit. Aliquam mattis dolor venenatis lacus convallis, sit amet elementum dolor euismod. Morbi sed sem blandit, imperdiet magna in, venenatis leo. Donec porta, odio sed ornare elementum, est mauris eleifend quam, id tempor lorem purus sit amet justo. Suspendisse rhoncus nulla eget enim maximus sollicitudin. Mauris rutrum, nibh nec hendrerit egestas, dui felis congue magna, sit amet dictum nibh nisl at neque. Sed placerat risus egestas ligula pharetra, eget rhoncus magna ultricies. Sed sed massa sit amet mauris tristique feugiat eget sit amet lorem. Sed hendrerit orci libero, id sodales tortor ultricies a.
+```
 
-Aliquam posuere sapien et orci venenatis, eget pharetra quam fermentum. Nullam in porta dui, sit amet tincidunt eros. Aliquam sit amet iaculis tortor. Mauris accumsan aliquet tellus eu viverra. Cras eu tempor eros. Donec tempor, leo in faucibus feugiat, diam ex ullamcorper libero, et tincidunt elit dolor non mi. Phasellus efficitur mattis sem eu faucibus. Donec tempor nunc ut libero accumsan, et venenatis mi pharetra. Suspendisse potenti. Aenean quis posuere dui. Nullam quis finibus nisi. Aliquam feugiat posuere massa sed aliquam. Aliquam pellentesque lectus nec consectetur aliquet.
+### Events Implementation
+The Event class that we are designing will have the following methods:
+- emit - It fires an event, with an event name and data.
+- subscribe - It subscribes to the event and gets executed every time the given event is fired.
+- unsubscribe - It will unsubscribe the function from the event.
+- unsubscribeAll - It will unsubscribe all the functions listening to that event.
+
+```javascript
+/**
+ * Disclaimer: This is not a production-quality code, lots of checks are not in place.
+ */
+function CustomEvent() {
+    // listers is an object
+    // it will be a map of event_name
+    // and all the functions subscribing to it
+    this.listeners = {};
+}
+
+CustomEvent.prototype.subscribe = function(eventName, someFunction) {
+    // checks if eventName exists
+    // if doesn't initialise a new array
+    // else push the function to the existing array
+    if(!this.listeners[eventName]) {
+        this.listeners[eventName] = [someFunction];
+        return;
+    }
+    this.listeners[eventName].push(someFunction);
+}
+
+CustomEvent.prototype.emit = function(eventName, data) {
+    // gets the event name
+    // and loops over all the functions that it has to call
+    const listeners = this.listeners[eventName];
+    listeners && Array.isArray(listeners) && listeners.map(listenr => {
+        listenr.call(null, data);
+    })
+    
+}
+
+CustomEvent.prototype.unsubscribeAll = function(eventName) {
+    this.listeners[eventName] = undefined;
+}
+
+CustomEvent.prototype.unsubscribe = function(eventName, someFunction) {
+    
+    const funcs = this.listeners[eventName];
+    
+    const filteredFuncs = funcs.filter(func => func.toString() !== someFunction.toString());
+    
+    this.listeners[eventName] = filteredFuncs;
+    
+}
+```
 
 
+If you guys have a better implementation for unsubscribing in mind, please suggest.
+Keep coding. Keep learning.
+Thanks.

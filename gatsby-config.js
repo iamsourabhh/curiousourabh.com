@@ -2,8 +2,8 @@ module.exports = {
   siteMetadata: {
     title: `Curious Sourabh`,
     author: {
-      name: `Sourabh`,
-      summary: `who lives and works in the moment, building and breaking stuff just for the kick of it.`,
+      name: `Sourabh.`,
+      summary: `Its an attempt to dive deeper and break the abstractions`,
     },
     description: `An attempt to dive deeper and break the abstractions`,
     siteUrl: `https://gatsby-starter-blog-demo.netlify.app/`,
